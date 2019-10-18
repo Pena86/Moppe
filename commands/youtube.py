@@ -28,17 +28,17 @@ class Youtube(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        # self.poll_delay = 15*60
+        self.poll_delay = 15*60
         self.channels = []
         self.active_streams = []
 
         self.notification_reciever = None
 
         self.youtube = build(API_SERVICE_NAME, API_VERSION, developerKey=config.youtube_api_key)
-        # self.poll_channels.start()
+        self.poll_channels.start()
 
     def cog_unload(self):
-        # self.poll_channels.cancel()
+        self.poll_channels.cancel()
         logger.info(f"Unloading youtube poll module")
 
     async def channel_name_to_id(self, ctx, name: str):
@@ -191,49 +191,32 @@ class Youtube(commands.Cog):
             self.channels = []
         logger.info(f"Ladattu {len(self.channels)} kanavaa\n{self.channels}")
 
-    '''
     async def poll_new_videos(self):
         global poll_delay
         time = datetime.datetime.now().replace(microsecond=0) - datetime.timedelta(seconds=poll_delay)
-        #time = datetime.datetime.now().replace(microsecond=0) - datetime.timedelta(hours=24)
         logger.info(f"Tarkistetaan viimeisimpiä youtube videoita...")
-        for cid in self.channels:
+        for cid, cname in self.channels:
             try:
-                videos = self.youtube.channels.get_videos(cid, limit=1, broadcast_type='archive,upload')
-                if videos and videos[0]['published_at'] > time:
+                request = self.youtube.search().list(
+                    part="snippet",
+                    channelId=cid,
+                    maxResults=1,
+                    order="date",
+                )
+                response = request.execute()
+                if len(response['items']) > 0 and datetime.datetime.strptime(response['items'][0]['snippet']['publishedAt'], "%Y-%m-%dT%H:%M:%S.%fZ") > time:
                     embed = discord.Embed(colour=0x0000FF,
-                            title = f"Video: {videos[0].channel.display_name}",
-                            url = videos[0].url,
-                            description = f"{videos[0].title}\nat: {videos[0].game}",)
-                    embed.set_thumbnail(url = videos[0].channel.logo)
+                            title=f"Video: {response['items'][0]['snippet']['channelTitle']}",
+                            url=f"https://www.youtube.com/channel/{response['items'][0]['snippet']['channelId']}",
+                            description=response['items'][0]['snippet']['description'])
+                    embed.set_thumbnail(url=response['items'][0]['snippet']['thumbnails']['default']['url'])
                     await self.notification_reciever.send(embed=embed)
             except Exception as e:
                 logger.warning(f"Error on youtube poll videos: {e}")
 
-    async def poll_active_streams(self):
-        if len(self.channels):
-            # Returns most popular streams when queried with empty list
-            streams = self.youtube.streams.get_live_streams(self.channels, limit=100)
-        else:
-            streams = []
-
-        new_active = []
-        for stream in streams:
-            new_active.append(stream.id)
-            if stream.id not in self.active_streams:
-                embed = discord.Embed(colour=0xFF0000,
-                        title = f"Stream: {stream.channel.display_name}",
-                        url = stream.channel.url,
-                        description = f"{stream.channel.status}\nat: {stream.channel.game}",)
-                embed.set_thumbnail(url = stream.channel.logo)
-                await self.notification_reciever.send(embed=embed)
-        self.active_streams = new_active.copy()
-        logger.info(f"Tarkistetaan aktiivisia youtube streameja: {[s.channel.display_name for s in streams]}")
-
     @tasks.loop(seconds = poll_delay)
     async def poll_channels(self):
         if self.notification_reciever:
-            await self.poll_active_streams()
             await self.poll_new_videos()
         else:
             logger.info(f"youtube poll module not yet fully loaded or no channel to post to")
@@ -245,7 +228,6 @@ class Youtube(commands.Cog):
         logger.info(f"Preloading youtube poll module")
         if config.channel_to_post:
             self.notification_reciever = self.bot.get_channel(config.channel_to_post)
-    '''
 
 
 def setup(bot):
