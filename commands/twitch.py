@@ -9,8 +9,6 @@ import logging
 
 import config
 
-#!!!!!!!https://discordpy.readthedocs.io/en/latest/ext/tasks/index.html read before banging your head too long!
-
 f_json = "twitch_channels.json"
 
 poll_delay = 15*60
@@ -23,7 +21,6 @@ class Twitch(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        #self.poll_delay = 15*60
         self.channels = []
         self.active_streams = []
 
@@ -87,7 +84,6 @@ class Twitch(commands.Cog):
     @twitch.group(name="lisaa", aliases=['add'])
     async def add_channel_to_list(self, ctx, name: str):
         """Add channel to follow list by channel name"""
-        #TODO: add user restriciotn!
         try:
             search = name.split("/")[-1:] #Jos url, otetaan lopusta kanavan nimi
             users = self.twitch.users.translate_usernames_to_ids(search)
@@ -115,7 +111,6 @@ class Twitch(commands.Cog):
     @twitch.group(name="poista", aliases=['remove'])
     async def remove_from_list(self, ctx, name: str):
         """Remove a channel from following list by channel name"""
-        #TODO: add user restriciotn!
         try:
             search = name.split("/")[-1:] #Jos url, otetaan lopusta kanavan nimi
             users = self.twitch.users.translate_usernames_to_ids(search)
@@ -158,7 +153,6 @@ class Twitch(commands.Cog):
     async def poll_new_videos(self):
         global poll_delay
         time = datetime.datetime.now().replace(microsecond=0) - datetime.timedelta(seconds=poll_delay)
-        #time = datetime.datetime.now().replace(microsecond=0) - datetime.timedelta(hours=24)
         logger.info(f"Tarkistetaan viimeisimpiä Twitch videoita...")
         for cid in self.channels:
             try:
@@ -175,7 +169,6 @@ class Twitch(commands.Cog):
 
     async def poll_active_streams(self):
         if len(self.channels):
-            # Returns most popular streams when queried with empty list
             streams = self.twitch.streams.get_live_streams(self.channels, limit=100)
         else:
             streams = []
@@ -209,10 +202,6 @@ class Twitch(commands.Cog):
         if config.channel_to_post:
             self.notification_reciever = self.bot.get_channel(config.channel_to_post)
 
-
-#DONE: save streams status and send only starting streams
-#TODO: live stream posts handle, when stream is over, del post
-#DONE: get latest videos and notify new videos
 
 def setup(bot):
     bot.add_cog(Twitch(bot))

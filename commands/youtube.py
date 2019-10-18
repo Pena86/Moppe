@@ -28,7 +28,6 @@ class Youtube(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-        self.poll_delay = 15*60
         self.channels = []
         self.active_streams = []
 
@@ -43,7 +42,6 @@ class Youtube(commands.Cog):
 
     async def channel_name_to_id(self, ctx, name: str):
         """Helper function to get youtube channel snippet by name"""
-        # TODO if original parameter is channel id, verify it
         request = self.youtube.search().list(
             part="snippet",
             maxResults=9,
@@ -132,7 +130,6 @@ class Youtube(commands.Cog):
     @youtube.group(name="lisaa", aliases=['add'])
     async def add_channel_to_list(self, ctx, name: str):
         """Add channel to follow list by channel name"""
-        # TODO: add user restriction!
         try:
             user = await self.channel_name_to_id(ctx, name)
             if user:
@@ -157,7 +154,6 @@ class Youtube(commands.Cog):
     @youtube.group(name="poista", aliases=['remove'])
     async def remove_from_list(self, ctx, name: str):
         """Remove a channel from following list by channel name"""
-        # TODO: add user restriction!
         try:
             user = await self.channel_name_to_id(ctx, name)
             if user and user['id']['channelId'] in [chan[0] for chan in self.channels]:
