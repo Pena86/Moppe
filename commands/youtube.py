@@ -141,7 +141,7 @@ class Youtube(commands.Cog):
 
                     embed = discord.Embed(colour=0xFF0000,
                                           title=f"Lisätään: {user['snippet']['title']}",
-                                          url=f"https://www.youtube.tv/{user['id']['channelId']}",
+                                          url=f"https://www.youtube.com/{user['id']['channelId']}",
                                           description=user['snippet']['description'], )
                     embed.set_thumbnail(url=user['snippet']['thumbnails']['default']['url'])
                     await ctx.send(embed=embed)
@@ -159,7 +159,7 @@ class Youtube(commands.Cog):
             if user and user['id']['channelId'] in [chan[0] for chan in self.channels]:
                 embed = discord.Embed(colour=0xFF0000,
                                       title=f"Poistetaan: {user['snippet']['title']}",
-                                      url=f"https://www.youtube.tv/{user['id']['channelId']}",
+                                      url=f"https://www.youtube.com/{user['id']['channelId']}",
                                       description=user['snippet']['description'], )
                 embed.set_thumbnail(url=user['snippet']['thumbnails']['default']['url'])
                 await ctx.send(embed=embed)
