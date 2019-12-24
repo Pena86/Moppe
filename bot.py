@@ -66,8 +66,9 @@ initial_extensions = (
     'commands.rps',
     'commands.admin',
     'commands.error_handler',
-    'commands.twitch',
-    'commands.youtube',
+    #'commands.twitch',
+    #'commands.youtube',
+    'commands.report',
 )
 
 
