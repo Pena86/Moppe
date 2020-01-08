@@ -8,3 +8,23 @@ twitch_client_id = "" #optional
 
 #https://developers.google.com/apis-explorer/?hl=en_GB#p/youtube/v3/
 youtube_api_key = "" #optional
+
+#Report
+guild_id = 446419809668694016 #Guild to report
+
+sheet_owner_email = "" #Bot shares the file to this email. Optional, if the folder is shared
+sheets_folder_id = "" #Google drive folder ID where to transfer the file
+
+ignored_channels = [
+  597434933861941288, #📊kyselyt
+  504760507425619990, #📰messis-uutiset
+  569580385726496796, #yhteisön-paimentaminen
+  542062669356728362, #moderointi-logi
+  538343157788704768, #⭐skynet-terminal
+  524337438462836779, #⭐botin-kesyttäminen
+  532946068967784508, #staff/ automaatio
+  542062669356728362, #staff/ moderointi-logi
+  539052695881908256, #staff/ laadullinen-reagointi
+  569580385726496796, #staff/ yhteisön-paimentaminen
+  502911862606659586, #staff/ yleinen
+]

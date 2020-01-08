@@ -61,7 +61,7 @@ game = discord.Game("Pythonized!")
 
 initial_extensions = (
     'commands.meta',
-    'commands.watch',
+    #'commands.watch',
     'commands.dice',
     'commands.rps',
     'commands.admin',

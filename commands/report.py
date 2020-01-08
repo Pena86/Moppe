@@ -43,7 +43,7 @@ class Report(commands.Cog):
         self.bot = bot
 
     @commands.group(name="raportti", aliases=["rep"], hidden=True)
-    @checks.is_staff()
+    #@checks.is_staff()
     async def rep(self, ctx):
         """Messis viikkoraportti"""
         logger.info(f"Viikkoraportin generointi. Komennon suorittaja: {ctx.author.display_name} "
@@ -58,7 +58,7 @@ class Report(commands.Cog):
 
 
     @rep.group(name="l", aliases=["1"], hidden=True)
-    @checks.is_staff()
+    #@checks.is_staff()
     async def list_all_channels(self, ctx):
         """Get channels to report"""
         await ctx.send(f"Viikkoraportti 1/3\nHaetaan lista kanavista palvelimella")
@@ -104,12 +104,12 @@ class Report(commands.Cog):
                     channel.id, channel.name, channel.permissions_for(guild.me).value)
         """
 
-        await ctx.send(f"Löydetty {len(channel_to_report)} kanavaa")
+        await ctx.send(f"Löydetty {len(channel_to_report)} kanavaa\nIgnorattu {len(channel_ignored)} kanavaa")
 
 
 
     @rep.group(name="a", aliases=["2"], hidden=True)
-    @checks.is_staff()
+    #@checks.is_staff()
     async def report_all_channels(self, ctx):
         """Get all messages from channel"""
         await ctx.send(f"Viikkoraportti 2/3\nHaetaan kaikki viestit kanavalistan mukaan")
@@ -119,7 +119,9 @@ class Report(commands.Cog):
         get_reactors = True #Fetching all users who have reacted is really slow. Disable it for faster
 
         #start = datetime.datetime(2019, 11, 24, 9, 0, 0)
-        #end = datetime.datetime(2019, 12, 1, 9, 0, 0)
+        #end = datetime.datetime(2019, 12, 29, 0, 0, 0)
+        #end = datetime.datetime(2020, 1, 1, 0, 0, 0)
+        #start = datetime.datetime(2019, 1, 1, 0, 0, 0)
         end = datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         start = end - datetime.timedelta(days=7)
 
@@ -196,7 +198,7 @@ class Report(commands.Cog):
 
 
     @rep.group(name="r", aliases=["3"], hidden=True)
-    @checks.is_staff()
+    #@checks.is_staff()
     async def create_report(self, ctx):
         """Create report from messages"""
         await ctx.send(f"Viikkoraportti 3/3\nLuetaan tiedot haetuista viesteistä")
@@ -209,6 +211,7 @@ class Report(commands.Cog):
         #print(len(messages))
 
         aamuvirkut = [5,6,7,8]
+        total_morning = 0
 
         days = {}
         hours = {}
@@ -258,6 +261,7 @@ class Report(commands.Cog):
 
             if m['m_created_at'].hour in aamuvirkut:
                 authors[m['aut_id']]['morning'] += 1
+                total_morning += 1
                 if m['cha_id'] not in authors[m['aut_id']]['morning_channels']:
                     authors[m['aut_id']]['morning_channels'][m['cha_id']] = 1
                 else:
@@ -281,15 +285,15 @@ class Report(commands.Cog):
                 else:
                     categories[m['cha_cat_id']]['authors'][m['aut_id']] += 1
 
-
-            if m['m_created_at'].day not in days.keys():
-                days[m['m_created_at'].day] = {'messages': 1, 'day': m['m_created_at'], 'w_day': VIIKONPAIVA[m['m_created_at'].strftime("%A")], 'authors': {m['aut_id']: 1}}
+            #select between m['m_created_at'].weekday() or m['m_created_at'].day, depending on your need
+            if m['m_created_at'].weekday() not in days.keys():
+                days[m['m_created_at'].weekday()] = {'messages': 1, 'day': m['m_created_at'], 'w_day': VIIKONPAIVA[m['m_created_at'].strftime("%A")], 'authors': {m['aut_id']: 1}}
             else:
-                days[m['m_created_at'].day]['messages'] += 1
-                if m['aut_id'] not in days[m['m_created_at'].day]['authors']:
-                    days[m['m_created_at'].day]['authors'][m['aut_id']] = 1
+                days[m['m_created_at'].weekday()]['messages'] += 1
+                if m['aut_id'] not in days[m['m_created_at'].weekday()]['authors']:
+                    days[m['m_created_at'].weekday()]['authors'][m['aut_id']] = 1
                 else:
-                    days[m['m_created_at'].day]['authors'][m['aut_id']] += 1
+                    days[m['m_created_at'].weekday()]['authors'][m['aut_id']] += 1
 
             if m['m_created_at'].hour not in hours.keys():
                 hours[m['m_created_at'].hour] = {'messages': 1, 'authors': {m['aut_id']: 1}}
@@ -376,7 +380,7 @@ class Report(commands.Cog):
             tunnit_text += "{}, {}, {}%, {}\n".format(l[0], l[1], l[1]/len(messages)*100, l[2])
 
 
-        henkilo_text = "Käyttäjien viestimäärät\nKäyttäjä, Viestit, Prosenttia kaikista, Aamu viestit, Kanava(viestit), [...]\n"
+        henkilo_text = "Käyttäjien viestimäärät, yhteensä käyttäjiä:, {}\nKäyttäjä, Viestit, Prosenttia kaikista, Aamu viestit, Kanava(viestit), [...]\n".format(len(authors))
         temp = []
         for k, v in authors.items():
 
@@ -401,15 +405,15 @@ class Report(commands.Cog):
         for l in temp:
             henkilo_text += "{}, {}, {}%, {}, {}\n".format(l[0], l[1], l[1]/len(messages)*100, l[2], l[3])
 
-        aamuvirkku_text = "Aamuvirkkujen viestimäärät ({}-{})\nKäyttäjä, Aamuvirkkuus, Kaikki viestit, Prosenttia käyttäjän viesteistä, Kanava(viestit), [...]\n".format(aamuvirkut[0], aamuvirkut[-1]+1)
+        aamuvirkku_text = "Aamuvirkkujen viestimäärät ({}-{}), yhteensä, {}\nKäyttäjä, Aamuvirkkuus, Prosenttia aamuviesteistä, Kaikki viestit, Prosenttia käyttäjän viesteistä, Kanava(viestit), [...]\n".format(aamuvirkut[0], aamuvirkut[-1]+1, total_morning)
         temp.sort(key=lambda elem: elem[2], reverse=True)
         for l in temp:
             if l[2] == 0:
                 break
-            aamuvirkku_text += "{}, {}, {}, {}%, {}\n".format(l[0], l[2], l[1], l[2]/l[1]*100, l[4])
+            aamuvirkku_text += "{}, {}, {}%, {}, {}%, {}\n".format(l[0], l[2], l[2]/total_morning*100, l[1], l[2]/l[1]*100, l[4])
 
 
-        kanavat_text = "Kanavakohtaiset viestimäärät ja kirjoittajat\nKanava, Aihealue, Viestit, Prosenttia kaikista, Käyttäjä(viestit), [...]\n"
+        kanavat_text = "Kanavakohtaiset viestimäärät ja kirjoittajat, yhteensä kanavia, {}\nKanava, Aihealue, Viestit, Prosenttia kaikista, Käyttäjä(viestit), [...]\n".format(len(channels))
         temp = []
         for k, v in channels.items():
             a_temp = []
@@ -520,7 +524,7 @@ class Report(commands.Cog):
 
 
     @rep.group(name="g", aliases=["4"], hidden=True)
-    @checks.is_staff()
+    #@checks.is_staff()
     async def upload_report_g_sheets(self, ctx):
         """Upload message data from txt to google sheets"""
         await ctx.send(f"Viikkoraportti 4/4\nLähetetään tiedot google sheetsiin")
@@ -558,7 +562,8 @@ class Report(commands.Cog):
 
 
             sh = client.create(sheet_title)
-            sh.share(config.sheet_owner_email, perm_type='user', role='writer', notify=False)
+            if hasattr(config, 'sheet_owner_email') and config.sheet_owner_email:
+                sh.share(config.sheet_owner_email, perm_type='user', role='writer', notify=False)
 
             res = sh.sheet1.update_cells(cells_to_update, value_input_option='USER_ENTERED')
             pprint(res)

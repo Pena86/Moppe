@@ -13,7 +13,7 @@ class Admin(commands.Cog):
         self.bot = bot
 
     @commands.command(hidden=True)
-    @checks.am_i_owner()
+    #@checks.am_i_owner()
     async def reload(self, ctx, ext: str):
         """Restart given extension if found"""
         try:

@@ -4,7 +4,6 @@ tokens.ini
 creds.json
 twitch_channels.json
 youtube_channels.json
-report/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
