@@ -516,6 +516,7 @@ class Report(commands.Cog):
         #print(last.strftime("%Y-%m-%d %A %H:%M:%S"))
 
         quick_stats_messages = "Viestimäärä\n" + str(len(messages))
+        quick_stats_users = "Aktiiviset käyttäjät\n"
         quick_stats_chat = "Topchatterit\n"
         quick_stats_morning = "Aamuvirkut\n"
         quick_stats_topic = "Aktiivisin aihekanava\n"
@@ -586,6 +587,7 @@ class Report(commands.Cog):
         #quick_stats_chat += ", ".join([l[0] for l in temp[:5]])
         for i,n in enumerate(temp[:5]):
             quick_stats_chat += str(i+1) + ". " + str(n[0]) + " "
+        quick_stats_users += str(len(authors))
 
         aamuvirkku_text = "Aamuvirkkujen viestimäärät ({}-{}), yhteensä, {}\nKäyttäjä, Aamuvirkkuus, Prosenttia aamuviesteistä, Kaikki viestit, Prosenttia käyttäjän viesteistä, Kanava(viestit), [...]\n".format(aamuvirkut[0], aamuvirkut[-1]+1, total_morning)
         temp.sort(key=lambda elem: elem[2], reverse=True)
