@@ -1,10 +1,43 @@
 in_production = False
 
-discord_bot_token = "insert_your_token_here"
-channel_to_post = discord_channel_id
+discord_bot_token = "insert_your_token_here" #token as string
+channel_to_post = discord_channel_id #id as int
+bot_own_user_id = bot_user_id #id as int
 
 #https://python-twitch-client.readthedocs.io/en/latest/v5/index.html
 twitch_client_id = "" #optional
 
 #https://developers.google.com/apis-explorer/?hl=en_GB#p/youtube/v3/
 youtube_api_key = "" #optional
+
+#Report
+guild_id = discord_guild_id #Guild to report. Guild id as int
+
+sheet_owner_email = "" #Bot shares the file to this email. Optional, if the folder is shared
+sheets_folder_id = "" #Google drive folder ID where to transfer the file
+
+#Other functions
+common_welcome_channel = common_channel_id
+automation_channel_id = staff_channel_id
+join_request_channel_id = staff_channel_id
+
+staff_role_id = staff_role_id
+
+ignored_channels = [
+  #list_of_channel_ids_as_int,
+]
+role_other = {
+  #role_id: 'role_name',
+}
+role_staff = {
+  #role_id: 'role_name',
+}
+role_vaikuttaja = {
+  #role_id: 'role_name',
+}
+role_paimen = {
+  #role_id: 'role_name',
+}
+role_aihe = {
+  #role_id: 'role_name',
+}
